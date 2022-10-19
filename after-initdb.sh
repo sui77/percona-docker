@@ -21,7 +21,7 @@ mysql -u root --password="initpassword" -e "GRANT REPLICATION SLAVE ON *.* TO 'r
 
 echo "Lock admin user from remote access"
 mysql -u root --password="initpassword" -e "ALTER USER 'root'@'%' IDENTIFIED BY '$ROOT_PW';"
-mysql -u root --password="initpassword" -e "ALTER USER 'root'@'%' IDENTIFIED BY '';"
+mysql -u root --password="initpassword" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '';"
 
 echo "Setting kubernetes secret"
 kubectl create secret generic $DBK8SNAME-credentials --namespace=$DBK8NAMESPACE --from-literal=APPLICATION_PW=$APPLICATION_PW --from-literal=REPLICATION_PW=$REPLICATION_PW
