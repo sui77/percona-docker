@@ -1,4 +1,4 @@
-FROM percona:8.0 AS perconaRsync
+FROM percona:8.0.29-21-centos AS perconaRsync
 
 USER root
 RUN yum update && yum -y install rsync
