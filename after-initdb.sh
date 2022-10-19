@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 # Generate random password for application & replication
-APPLICATION_PW=`< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c24`
-REPLICATION_PW=`< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c24`
+APPLICATION_PW=`openssl rand -hex 20`
+REPLICATION_PW=`openssl rand -hex 20`
 
 echo "APPLICATION_PW = ${APPLICATION_PW}"
 echo "REPLICATION_PW = ${REPLICATION_PW}"
