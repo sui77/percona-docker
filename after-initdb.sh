@@ -10,4 +10,8 @@ mysql --password="" -e "CREATE DATABASE application";
 mysql --password="" -e "GRANT ALL PRIVILEGES ON application TO 'application'@'%'";
 mysql --password="" -e "GRANT REPLICATION SLAVE ON *.*  TO 'replication'@'%' IDENTIFIED BY '$REPLICATION_PW'";
 
+echo "APPLICATION_PW = ${APPLICATION_PW}"
+echo "REPLICATION_PW = ${REPLICATION_PW}"
+
 kubectl create secret generic $DBK8SNAME-credentials --namespace=$DBK8NAMESPACE --from-literal=APPLICATION_PW=$APPLICATION_PW --from-literal=REPLICATION_PW=$REPLICATION_PW
+echo "Done."
