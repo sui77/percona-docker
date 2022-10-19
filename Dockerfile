@@ -11,4 +11,4 @@ FROM perconaRsync
 ENV MYSQL_ALLOW_EMPTY_PASSWORD true
 COPY after-initdb.sh /docker-entrypoint-initdb.d/after-initdb.sh
 RUN chmod 755 /docker-entrypoint-initdb.d/after-initdb.sh
-USER mysql
+#USER mysql
