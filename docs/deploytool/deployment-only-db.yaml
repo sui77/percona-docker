@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: percona-secret-writer
+  namespace: {{NAMESPACE}}
+
+---
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: percona-secret-writer
+rules:
+  - apiGroups: ["*"]
+    resources: ["secrets"]
+    verbs: ["*"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: percona-secret-writer-binding
+  namespace: {{NAMESPACE}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: percona-secret-writer
+subjects:
+  - kind: ServiceAccount
+    name: percona-secret-writer
+    namespace: {{NAMESPACE}}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{NAME}}-main-pvc
+  namespace: {{NAMESPACE}}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{PVSIZE}}
+  storageClassName: hcloud-volumes
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{NAME}}
+  namespace: {{NAMESPACE}}
+spec:
+  selector:
+    matchLabels:
+      run: {{NAME}}
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        run: {{NAME}}
+    spec:
+      imagePullSecrets:
+        - name: {{IMAGEPULLSECRETS}}
+      serviceAccountName: percona-secret-writer
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
+      containers:
+        - name: main
+          image: sui77/percona:latest
+          env:
+            - name: DBK8SNAME
+              value: {{NAME}}
+            - name: DBK8SNAMESPACE
+              value: {{NAMESPACE}}
+          volumeMounts:
+            - name: {{NAME}}-main-pv
+              readOnly: false
+              mountPath: "/var/lib/mysql"
+              subPath: "data12"
+      volumes:
+        - name: {{NAME}}-main-pv
+          persistentVolumeClaim:
+            claimName: {{NAME}}-main-pvc
+        - name: sshkey
+          secret:
+            defaultMode: 0600
+            secretName: {{NAME}}-sshkey
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{NAME}}
+  namespace: {{NAMESPACE}}
+spec:
+  selector:
+    run: {{NAME}}
+  ports:
+    - name: mysql
+      port: 3306

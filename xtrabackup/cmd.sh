@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Set env that otherwise are not available in cron
+env >> /etc/environment
+
 # Create target dir
 mkdir -p /backups
 
