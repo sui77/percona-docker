@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mkdir -r /backups
+mkdir -p /backups
 
 # Install ssh keys if present
 if test -f "/data/sshkey/id_rsa"; then
