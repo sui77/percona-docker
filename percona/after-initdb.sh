@@ -19,7 +19,7 @@ mysql -u root --password="initpassword" -e "ALTER USER 'root'@'localhost' IDENTI
 
 echo "Setting kubernetes secret"
 if [ ! -z ${DBK8SNAME} ]; then
-  kubectl create secret generic $DBK8SNAME-credentials --namespace=$DBK8NAMESPACE --from-literal=APPLICATION_PW=$APPLICATION_PW --from-literal=REPLICATION_PW=$REPLICATION_PW
+  kubectl create secret generic $DBK8SNAME-credentials --namespace=$DBK8NAMESPACE --from-literal=APPLICATION_PW=$APPLICATION_PW --from-literal=ROOT_PW=$ROOT_PW
 else
   echo "DBK8SNAME not set, skipping."
 fi
