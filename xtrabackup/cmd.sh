@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Create target dir
 mkdir -p /backups
 
 # Install ssh keys if present
