@@ -11,3 +11,5 @@ rm -rf /backups/$FILENAME
 rsync -avz /backups/ $RSYNC_TO &> /backups/backup.txt
 
 rm -rf /backups/$FILENAME.tar.gz
+
+mv /backups/backup.txt /backups/backup_prev.txt
