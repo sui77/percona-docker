@@ -12,6 +12,7 @@ echo "Creating user application"
 mysql -u root --password="initpassword" -e "CREATE USER 'application'@'%' IDENTIFIED BY '$APPLICATION_PW';"
 mysql -u root --password="initpassword" -e "CREATE DATABASE application;";
 mysql -u root --password="initpassword" -e "GRANT ALL PRIVILEGES ON application.* TO 'application'@'%'";
+mysql -u root --password="initpassword" -e "ALTER USER 'application'@'%' IDENTIFIED WITH mysql_native_password BY '$APPLICATION_PW'";
 
 echo "Lock admin user from remote access"
 mysql -u root --password="initpassword" -e "ALTER USER 'root'@'%' IDENTIFIED BY '$ROOT_PW';"
