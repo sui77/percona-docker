@@ -17,4 +17,7 @@ RUN chmod 755 /usr/bin/xtrabackup
 
 COPY after-initdb.sh /docker-entrypoint-initdb.d/after-initdb.sh
 RUN chmod 777 /docker-entrypoint-initdb.d/after-initdb.sh
+COPY dbcopy.bash /dbcopy.bash
+RUN chmod 777 /dbcopy.bash
+
 USER mysql
