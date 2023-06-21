@@ -6,6 +6,8 @@ RUN microdnf -y install cronie vi tar openssh-clients
 
 COPY ./run-db-backup.sh /run-db-backup.sh
 COPY ./cmd.sh /cmd.sh
+COPY ./restore.sh /restore.sh
+
 RUN chmod +x /*.sh
 
 
