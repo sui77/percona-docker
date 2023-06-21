@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 function showUsage() {
     scriptName=`basename $0`
     echo ""
@@ -38,7 +39,7 @@ function localBakCopy() {
     echo "### Target database exists, creating a backup copy to $BAK"
     mysql -u root -e "CREATE DATABASE \`$BAK\`"
     mysqldump $DB_TO | mysql $BAK -u root
-    mysql -u root -e "DROP DATABASE $DB_TO"
+    mysql -u root -e "DROP DATABASE \`$DB_TO\`"
   fi
 }
 
@@ -56,7 +57,7 @@ function restoreDB() {
 
   localBakCopy
 
-  mysql -u root -e "CREATE DATABASE $DB_TO"
+  mysql -u root -e "CREATE DATABASE \`$DB_TO\`"
 
   echo ""
   echo "### Importing dump..."
@@ -96,7 +97,7 @@ function copyDB() {
 
   localBakCopy
 
-  mysql -u root -e "CREATE DATABASE $DB_TO"
+  mysql -u root -e "CREATE DATABASE \`$DB_TO\`"
 
   echo ""
   echo "### Creating dump..."
