@@ -8,9 +8,9 @@ function showUsage() {
     echo "Commands:"
     echo ""
     echo "  copyfrom [-h host] [-u user] \\"
-    echo "           [-n name] [-port p]         copy remote db to the local"
-#    echo ""
-#    echo "  restore  [-f filename]               restore a backup file to local"
+    echo "           [-n name] [-port p] [-to dbname]   copy remote db to the local"
+    echo ""
+    echo "  restore  [-f filename] [-to dbname]         restore a backup file to local"
     echo ""
 }
 
@@ -28,6 +28,42 @@ function validateCommand() {
         fi
     done
     return 1
+}
+
+function localBakCopy() {
+  DB_EXISTS=`mysql -u root -e "SHOW DATABASES LIKE '$DB_TO';"`
+  if [ "$DB_EXISTS" != "" ]; then
+    BAK="bak-$DB_TO-$DATE_NOW"
+    echo ""
+    echo "### Target database exists, creating a backup copy to $BAK"
+    mysql -u root -e "CREATE DATABASE \`$BAK\`"
+    mysqldump $DB_TO | mysql $BAK -u root
+    mysql -u root -e "DROP DATABASE $DB_TO"
+  fi
+}
+
+function restoreDB() {
+  VALID=1
+  if [ "$RESTORE_FILE" == "" ]; then
+    echo "[!] missing -f file"
+    VALID=0
+  fi
+
+  if [ "$DB_TO" == "" ]; then
+    echo "[!] missing -to dbname"
+    VALID=0
+  fi
+
+  localBakCopy
+
+  mysql -u root -e "CREATE DATABASE $DB_TO"
+
+  echo ""
+  echo "### Importing dump..."
+  mysql -u root $DB_TO < $RESTORE_FILE
+  rm /tmp/dump.sql
+
+
 }
 
 function copyDB() {
@@ -58,16 +94,7 @@ function copyDB() {
     exit 1
   fi
 
-  DB_EXISTS=`mysql -u root -e "SHOW DATABASES LIKE '$DB_TO';"`
-  if [ "$DB_EXISTS" != "" ]; then
-    BAK="bak-$DB_TO-$DATE_NOW"
-    echo ""
-    echo "### Target database exists, creating a backup copy to $BAK"
-    mysql -u root -e "CREATE DATABASE \`$BAK\`"
-    mysqldump $DB_TO | mysql $BAK -u root
-    mysql -u root -e "DROP DATABASE $DB_TO"
-  fi
-
+  localBakCopy
 
   mysql -u root -e "CREATE DATABASE $DB_TO"
 
@@ -97,7 +124,6 @@ fi
 
 DB_PORT=3306
 printf -v DATE_NOW '%(%Y-%m-%d-%H%M%S)T\n' -1
-echo "DN= $DATE_NOW"
 
 # smart CLI arguments: http://linuxcommand.org/wss0130.php
 while [ "$1" != "" ]; do
@@ -120,7 +146,9 @@ while [ "$1" != "" ]; do
         -to)        shift
                     DB_TO=$1
                     ;;
-
+        -f)         shift
+                    RESTORE_FILE=$1
+                    ;;
         * )         echo ""
                     echo "[!] invalid option $1"
                     echo ""
